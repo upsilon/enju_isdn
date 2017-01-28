@@ -1,0 +1,34 @@
+language: ruby
+
+sudo: false
+
+cache: bundler
+
+services:
+  - redis-server
+
+env:
+  - DB=sqlite
+  - DB=mysql
+  - DB=postgresql
+
+rvm:
+  - 2.1.9
+  - 2.2.6
+  - 2.3.3
+
+before_script:
+  - mysql -e 'create database enju_test'
+  - psql -c 'create database enju_test;' -U postgres
+  - bundle exec rake db:migrate
+
+gemfile:
+  - gemfiles/rails_4.2.gemfile
+  - gemfiles/rails_5.0.gemfile
+
+matrix:
+  exclude:
+    - rvm: 2.1.9
+      gemfile: gemfiles/rails_5.0.gemfile
+  allow_failures:
+    - gemfile: gemfiles/rails_5.0.gemfile
